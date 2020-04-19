@@ -70,5 +70,5 @@ class GridWorld:
             self.__update_action_state(sx, sy, 'S', state)
 
 
-    
+
 
