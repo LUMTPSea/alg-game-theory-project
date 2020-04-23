@@ -51,6 +51,19 @@ class LocalNoRegret:
                         state, action, self.pi[time, agent, state, action]))
                 print()
 
+    def __optimal_path(self):
+        start, end = State(4, 1), State(4, 12)
+        state, path = start, []
+        while state != end:
+            path.append(state)
+            next_action, best_val = '', 0
+            for action in self.actions[1, state]:
+                if self.pi[self.time_limit, 1, state, action] >= best_val:
+                    best_val = self.pi[self.time_limit, 1, state, action]
+                    next_action = action
+            state = GridWorld.perform_action(state, next_action)
+        print(path)
+
     def lonr_v(self):
         for time in range(1, self.time_limit + 1):
             for agent in range(1, self.num_agents + 1):
@@ -62,11 +75,10 @@ class LocalNoRegret:
                 for state in self.state_space:
                     self.update_policy(agent, state, time)
 
-            # self.__display_policy(time)
-
         self.__plot__val()
         print(self.q[self.time_limit, 1, State(4, 1), 'N'])
         print(self.q[self.time_limit, 1, State(4, 1), 'E'])
+        self.__optimal_path()
 
     def update_q(self, agent, state, time):
         for action in self.actions[agent, state]:

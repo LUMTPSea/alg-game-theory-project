@@ -28,6 +28,17 @@ class GridWorld:
         self.__fill_rewards()
         self.__fill_transitions()
 
+    @classmethod
+    def perform_action(cls, state, action):
+        if action == 'N':
+            return State(state.x - 1, state.y)
+        elif action == 'E':
+            return State(state.x, state.y + 1)
+        elif action == 'W':
+            return State(state.x, state.y - 1)
+        else:
+            return State(state.x + 1, state.y)
+
     def __display_rewards(self):
         for r in range(self.rows):
             for c in range(self.cols):
