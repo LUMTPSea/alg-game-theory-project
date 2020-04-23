@@ -33,7 +33,7 @@ class LocalNoRegret:
     def __display_q_values(self, time):
         for agent in range(1, self.num_agents + 1):
             print("For agent: ", agent)
-            print("For time: ", time + 1)
+            print("For time: ", time)
             for state in self.state_space:
                 for action in self.actions[agent, state]:
                     print("For state: {}, action: {}, q_val: {}".format(
@@ -43,7 +43,7 @@ class LocalNoRegret:
     def __display_policy(self, time):
         for agent in range(1, self.num_agents + 1):
             print("For agent: ", agent)
-            print("For time: ", time + 1)
+            print("For time: ", time)
             for state in self.state_space:
                 for action in self.actions[agent, state]:
                     print("For state: {}, action: {}, policy: {}".format(
@@ -84,8 +84,8 @@ class LocalNoRegret:
             q, pi = 0, 0
             if quartet in self.q:
                 q = self.q[quartet]
-            if quartet in self.pi:
-                pi = self.pi[quartet]
+            if (time - 1, agent, next_state, action) in self.pi:
+                pi = self.pi[time - 1, agent, next_state, action]
             val += q * pi
         return val
 
@@ -137,7 +137,7 @@ class LocalNoRegret:
             if (time, agent, state, action) in self.q:
                 q_val = self.q[time, agent, state, action]
             if (time, agent, state, action) in self.pi:
-                prob = self.pi[time, agent, state, action]
+                prob = self.pi[time - 1, agent, state, action]
             val += prob * q_val
         return val
 
