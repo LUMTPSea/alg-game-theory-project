@@ -85,3 +85,11 @@ this phenomenon is an interesting direction for future work._ "
     - Read the conclusion in the paper. 4-5 ideas stated.
     
 ---
+
+### System Code Design
+
+- Data Structures that the LONR system expects from an _environment_
+    - actions: (agent x state) -> list of actions
+    - next_states: (agent x state) -> list of states
+    - transitions: (agent x init_state x action x next_state) -> probability value
+    - rewards: (agent x state x action) -> real value.
