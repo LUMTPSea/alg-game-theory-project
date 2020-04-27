@@ -17,16 +17,17 @@ class LocalNoRegret:
         self.regret_sums = {}
 
     def __plot__val(self):
-        y_avg = [self.q[1, 1, State(2, 1), 'N']]
-        y_abs = [self.q[1, 1, State(2, 1), 'N']]
+        # y_avg = [self.q[1, 1, State(4, 1), 'N']]
+        y_abs = [self.q[1, 1, State(4, 1), 'N']]
         tot = 0
         for t in range(2, self.time_limit + 1):
-            tot += self.q[t, 1, State(2, 1), 'N']
-            y_abs.append(self.q[t, 1, State(2, 1), 'N'])
-            y_avg.append(tot / t)
+            tot += self.q[t, 1, State(4, 1), 'N']
+            y_abs.append(self.q[t, 1, State(4, 1), 'N'])
+            # y_avg.append(tot / t)
 
-        plt.plot([x for x in range(1, self.time_limit + 1)], [-4.0 for _ in range(1, self.time_limit + 1)])
-        plt.plot([x for x in range(1, self.time_limit + 1)], y_avg)
+        plt.plot([x for x in range(1, self.time_limit + 1)],
+                 [-13.0 for _ in range(1, self.time_limit + 1)], linestyle=':')
+        # plt.plot([x for x in range(1, self.time_limit + 1)], y_avg)
         plt.plot([x for x in range(1, self.time_limit + 1)], y_abs)
         plt.savefig('plot.png')
 
@@ -50,22 +51,34 @@ class LocalNoRegret:
                         state, action, self.pi[time, agent, state, action]))
                 print()
 
+    def __optimal_path(self):
+        start, end = State(4, 1), State(4, 12)
+        state, path = start, []
+        while state != end:
+            path.append(state)
+            next_action, best_val = '', 0
+            for action in self.actions[1, state]:
+                if self.pi[self.time_limit, 1, state, action] >= best_val:
+                    best_val = self.pi[self.time_limit, 1, state, action]
+                    next_action = action
+            state = GridWorld.perform_action(state, next_action)
+        print(path)
+
     def lonr_v(self):
         for time in range(1, self.time_limit + 1):
             for agent in range(1, self.num_agents + 1):
                 for state in self.state_space:
                     self.update_q(agent, state, time)
-            self.__display_q_values(time)
+            # self.__display_q_values(time)
 
             for agent in range(1, self.num_agents + 1):
                 for state in self.state_space:
                     self.update_policy(agent, state, time)
 
-            self.__display_policy(time)
-
         self.__plot__val()
-        print(self.q[self.time_limit, 1, State(2, 1), 'N'])
-        print(self.q[self.time_limit, 1, State(2, 1), 'E'])
+        print(self.q[self.time_limit, 1, State(4, 1), 'N'])
+        print(self.q[self.time_limit, 1, State(4, 1), 'E'])
+        self.__optimal_path()
 
     def update_q(self, agent, state, time):
         for action in self.actions[agent, state]:
@@ -80,7 +93,7 @@ class LocalNoRegret:
     def __get_next_state_value(self, agent, next_state, time):
         val = 0
         for action in self.actions[agent, next_state]:
-            quartet = time, agent, next_state, action
+            quartet = time - 1, agent, next_state, action
             q, pi = 0, 0
             if quartet in self.q:
                 q = self.q[quartet]
@@ -101,12 +114,8 @@ class LocalNoRegret:
         """
         expected_value, total_regret_sum = self.__get_expected_reward(agent, state, time), 0
 
-        # print("State: ", state)
-        # print("Exp val: ", expected_value)
-
         for action in self.actions[agent, state]:
             immediate_regret = max(0, self.q[time, agent, state, action] - expected_value)
-            # print("For action: {}, imm regret: {}".format(action, immediate_regret))
             triplet = agent, state, action
             if triplet in self.regret_sums:
                 self.regret_sums[triplet] += immediate_regret
@@ -116,8 +125,6 @@ class LocalNoRegret:
         for action in self.actions[agent, state]:
             triplet = agent, state, action
             total_regret_sum += self.regret_sums[triplet]
-
-        # print("Total regret sum: ", total_regret_sum)
 
         for action in self.actions[agent, state]:
             triplet = agent, state, action
@@ -136,7 +143,7 @@ class LocalNoRegret:
             q_val, prob = 0, 0
             if (time, agent, state, action) in self.q:
                 q_val = self.q[time, agent, state, action]
-            if (time, agent, state, action) in self.pi:
+            if (time - 1, agent, state, action) in self.pi:
                 prob = self.pi[time - 1, agent, state, action]
             val += prob * q_val
         return val

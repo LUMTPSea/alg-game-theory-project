@@ -15,7 +15,7 @@ class State:
 
 
 class GridWorld:
-    def __init__(self, rows=2, cols=3):
+    def __init__(self, rows=4, cols=12):
         self.rows = rows
         self.cols = cols
         self.transitions = {}
@@ -28,11 +28,34 @@ class GridWorld:
         self.__fill_rewards()
         self.__fill_transitions()
 
+    @classmethod
+    def perform_action(cls, state, action):
+        if action == 'N':
+            return State(state.x - 1, state.y)
+        elif action == 'E':
+            return State(state.x, state.y + 1)
+        elif action == 'W':
+            return State(state.x, state.y - 1)
+        else:
+            return State(state.x + 1, state.y)
+
+    def __display_rewards(self):
+        for r in range(self.rows):
+            for c in range(self.cols):
+                if r == self.rows - 1 and c == self.cols - 1:
+                    continue
+                print("State: ", r + 1, c + 1)
+                tup = []
+                for action in self.actions[1, State(r + 1, c + 1)]:
+                    tup.append((action, self.rewards[1, State(r + 1, c + 1), action]))
+                print(tup)
+            print()
+
     def display(self):
         print("Grid Dimensions: ({} x {})\n".format(self.rows, self.cols))
         print("\n*States Space*: ", self.state_space)
         print("\n\n*Actions*: ", self.actions)
-        print("\n\n*Rewards*: ", self.rewards)
+        self.__display_rewards()
         print("\n\n*Transitions*: ", self.transitions)
 
     def __fill_state_space(self):
@@ -73,27 +96,22 @@ class GridWorld:
         for state in self.state_space:
             for action in self.actions[1, state]:
                 triplet = 1, state, action
-                # if state.x == 4 and state.y == 1 and action == 'E':
-                #     self.rewards[triplet] = -100
-                # elif state.x == 4 and state.y == 12 and action == 'W':
-                #     self.rewards[triplet] = -100
-                # elif state.x == 3 and state.y == 12 and action == 'S':
-                #     self.rewards[triplet] = 100
-                # elif state.x == 3 and 2 <= state.y <= 11 and action == 'S':
-                #     self.rewards[triplet] = -100
-                # else:
-                #     self.rewards[triplet] = -1
-
-                if state.x == 2 and state.y == 1 and action == 'E':
+                if state.x == 4 and state.y == 1 and action == 'E':
                     self.rewards[triplet] = -100
-                elif state.x == 2 and state.y == 3 and action == 'W':
+                elif state.x == 3 and 2 <= state.y <= 11 and action == 'S':
                     self.rewards[triplet] = -100
-                elif state.x == 1 and state.y == 3 and action == 'S':
-                    self.rewards[triplet] = 100
-                elif state.x == 1 and state.y == 2 and action == 'S':
+                elif (state.x == 4 and 3 <= state.y <= 10) and (action == 'E' or action == 'W'):
                     self.rewards[triplet] = -100
-                elif state.x == 2 and state.y == 2 and action == 'E':
-                    self.rewards[triplet] = 100
+                elif state.x == 4 and state.y == 2 and action == 'W':
+                    self.rewards[triplet] = -1
+                elif state.x == 4 and state.y == 2 and action == 'E':
+                    self.rewards[triplet] = -100
+                elif state.x == 4 and state.y == 11 and action == 'W':
+                    self.rewards[triplet] = -100
+                elif state.x == 4 and state.y == 11 and action == 'E':
+                    self.rewards[triplet] = -1
+                elif state.x == 3 and state.y == 12 and action == 'S':
+                    self.rewards[triplet] = -1
                 else:
                     self.rewards[triplet] = -1
 
