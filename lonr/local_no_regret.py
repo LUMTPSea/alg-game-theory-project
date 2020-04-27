@@ -1,3 +1,5 @@
+from typing import Dict, Any
+
 from environments.gridworld import GridWorld, State
 import matplotlib.pyplot as plt
 
@@ -62,23 +64,40 @@ class LocalNoRegret:
                     best_val = self.pi[self.time_limit, 1, state, action]
                     next_action = action
             state = GridWorld.perform_action(state, next_action)
-        print(path)
+        return path
 
     def lonr_v(self):
         for time in range(1, self.time_limit + 1):
             for agent in range(1, self.num_agents + 1):
                 for state in self.state_space:
                     self.update_q(agent, state, time)
-            # self.__display_q_values(time)
 
             for agent in range(1, self.num_agents + 1):
                 for state in self.state_space:
                     self.update_policy(agent, state, time)
 
-        self.__plot__val()
-        print(self.q[self.time_limit, 1, State(4, 1), 'N'])
-        print(self.q[self.time_limit, 1, State(4, 1), 'E'])
-        self.__optimal_path()
+    def get_optimal_values_list(self, state, action):
+        val_list = {}
+        for agent in range(1, self.num_agents + 1):
+            val_list[agent] = []
+            for time in range(1, self.time_limit + 1):
+                val_list[agent].append(self.q[time, agent, state, action])
+        return val_list
+
+    def get_policies_diff_list(self):
+        diff_list = {}
+        for agent in range(1, self.num_agents + 1):
+            diff_list[agent] = []
+            for time in range(2, self.time_limit + 1):
+                diff = 0
+                for state in self.state_space:
+                    for action in self.actions[agent, state]:
+                        diff += abs(self.pi[time, agent, state, action] - self.pi[time - 1, agent, state, action])
+                diff_list[agent].append(diff)
+        return diff_list
+
+    def get_optimal_path(self):
+        return self.__optimal_path()
 
     def update_q(self, agent, state, time):
         for action in self.actions[agent, state]:
