@@ -1,1 +1,1 @@
-Primary Paper: https://arxiv.org/pdf/1910.03094.pdf 
+Worked on the Kash et. al. [paper](https://arxiv.org/pdf/1910.03094.pdf) regarding the combination of Q-learning and Games. Read the informal notes [here](https://github.com/souravchk25/alg-game-theory-project/blob/master/notes.md)
